@@ -7,7 +7,7 @@ const router = express.Router();
 const dbKnex = require("../data/db_config"); 
 
 //método get ele retorna todos os livros do banco de dados
-router.get("/",async(req,res) => {
+router.get("/", async(req,res) => {
     try{
         //para obter os livros pode-se utilizar .select().orderBy() ou apenas .orderBy()
         const livros = await dbKnex("livros").orderBy("id","cres");

@@ -3,7 +3,7 @@ const http = require('http');
 
 //ip e porta do servidor nodejs
 const hostname = '127.0.0.1';//localhost
-const port = 3000;
+const port = 3001;
 
 const server = http.createServer((req, res) => {
   res.statusCode = 200;

@@ -1,13 +1,16 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3001
 const bodyParser = require('body-parser');
+const cors = require('cors')
+app.use(cors());
 //aplicação pelo método get vai buscar a rota 
-// localhost:3000/
+// localhost:3001/
 // Configura o body-parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //Arquivo com rotas para o cadastro de livros
+
 
 const editoras = require('./routes/editoras');
 app.use('/editoras', editoras);
@@ -29,7 +32,7 @@ app.get('/', (req, res) => {
 })
 //exemplo relacionado a filmes localhost:3000/filmes
 app.use(express.json()); //começa a receber json
-app.post('/filmes',(req,res) => {
+app.post('/filmes', (req,res) => {
 //const titulo = req.body.titulo;
 //const genero = req.body.genero;
 const {titulo, genero} = req.body;
