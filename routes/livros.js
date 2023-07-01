@@ -85,4 +85,19 @@ router.get("/:filtro/:palavra", async(req,res)=>{
     }
 });
 
+// resumo do cadastro de livros
+router.get("/dados/resumo", async (req,res)=>{
+    try{
+        const livros = await dbKnex("livros")
+        .count({num:"*"})
+        .sum({soma:"preco"})
+        .max({maior:"preco"})
+        .avg({media:"preco"});
+        const {num,soma,maior,media} = livros[0];
+        res.status(200).json({num,soma,maior,media:Number(media.toFixed(2))});
+    }catch(error){
+        res.status(400).json({msg:error.message}); //retorna status de erro e msg
+    }
+});
+
 module.exports = router;
