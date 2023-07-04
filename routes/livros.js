@@ -7,10 +7,10 @@ const router = express.Router();
 const dbKnex = require("../data/db_config"); 
 
 //método get ele retorna todos os livros do banco de dados
-router.get("/", async(req,res) => {
+router.get("/",async(req,res) => {
     try{
         //para obter os livros pode-se utilizar .select().orderBy() ou apenas .orderBy()
-        const livros = await dbKnex("livros").orderBy("id","cres");
+        const livros = await dbKnex("livros").orderBy("id","desc");
         res.status(200).json(livros); //retorna statusCode ok e os dados
     }catch(error){
         res.status(400).json({msg:error.message}); //retorna status de erro e msg
@@ -26,7 +26,7 @@ router.post("/",async (req,res)=>{
     //const ano = req.params.ano;
     //const preco = req.params.preco;
     //const foto = req.params.foto;
-    
+   
     const {titulo, autor, ano, preco, foto} = req.body;
     
     //se algum dos campos não foi passado, irá enviar uma mensagem de erro ao retornar
@@ -49,7 +49,7 @@ router.post("/",async (req,res)=>{
 //método put é usado para alteração. id indica o registro a ser alterado
 router.put("/:id",async(req,res) => {
     const id = req.params.id; //
-    const {preco} = req.body; //campo a ser alterado
+    const {preco} = req.body; // { "preco": "19.99" }
     try{
         //altera o campo preco, no registro cujo id coincidir com o parametro passado
         await dbKnex("livros").update({preco}).where({id});
@@ -71,33 +71,45 @@ router.delete("/:id",async(req,res) => {
     }
 });
 
-
 //Filtro por titulo ou por autor
-router.get("/:filtro/:palavra", async(req,res)=>{
-    const palavra = req.params.palavra;
+router.get("/filtro/:palavra", async(req,res)=> {
+    const palavra = req.params.palavra; // palavra ou titulo a pesquisar
     try{
-        const livros = await dbKnex("livros")
-        .where("titulo", "like", `%${palavra}%`)
-        .orWhere("autor", "like", `%${palavra}%`);
-        res.status(200).json(livros); //restorna statusCode ok e os dados
-    }catch(error){
-        res.status(400).json({msg:error.message}); //retorna status de erro e msg
-    }
+            const livros = await dbKnex("livros")
+            .where("titulo","like", `%${palavra}%`)
+            .orWhere("autor","like",`%${palavra}%`);
+            res.status(200).json(livros); //retorna statusCode ok e os dados
+        }catch(error){
+            res.status(400).json({msg:error.message}); //retorna status de erro e msg
+        }
 });
 
-// resumo do cadastro de livros
-router.get("/dados/resumo", async (req,res)=>{
+//Resumo do cadastro de livros
+router.get("/dados/resumo",async (req,res) =>{
     try{
         const livros = await dbKnex("livros")
-        .count({num:"*"})
-        .sum({soma:"preco"})
-        .max({maior:"preco"})
-        .avg({media:"preco"});
+        .count({num: "*"})
+        .sum({soma: "preco"})
+        .max({maior: "preco"})
+        .avg({media: "preco"});
         const {num,soma,maior,media} = livros[0];
         res.status(200).json({num,soma,maior,media:Number(media.toFixed(2))});
     }catch(error){
         res.status(400).json({msg:error.message}); //retorna status de erro e msg
     }
-});
+})
+
+//Exibir o gráfico com a soma dos preços agrupados por ano
+router.get("/dados/grafico",async (req,res) =>{
+    try{
+        //obtém ano e soma do preço dos livros, Agrupados por ano
+        const totalPorAno = await dbKnex("livros").select("ano")
+        .sum({total:"preco"}).groupBy("ano");
+        res.status(200).json(totalPorAno);
+    }catch(error){
+        res.status(400).json({msg:error.message}); //retorna status de erro e msg
+    }
+})
+
 
 module.exports = router;
