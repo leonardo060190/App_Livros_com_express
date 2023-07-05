@@ -10,7 +10,7 @@ exports.up = function(knex) {
         table.string("estado",50).notNullable();
         table.string("telefone",14).notNullable();
         table.string("rua",100).notNullable();
-        table.string("cep",8).notNullable();
+        table.string("cep",10).notNullable();
       });
 };
 

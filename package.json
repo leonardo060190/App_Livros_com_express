@@ -1,5 +1,5 @@
 {
-  "name": "nodejs",
+  "name": "primeiro_app",
   "version": "1.0.0",
   "description": "aplicativo backend em nodejs",
   "main": "app.js",
