@@ -69,42 +69,14 @@ router.delete("/:id",async(req,res) => {
 router.get("/filtro/:palavra", async(req,res)=> {
     const palavra = req.params.palavra; // palavra ou titulo a pesquisar
     try{
-            const livros = await dbKnex("editoras")
+            const editoras = await dbKnex("editoras")
             .where("nome","like", `%${palavra}%`)
             .orWhere("telefone","like",`%${palavra}%`);
-            res.status(200).json(livros); //retorna statusCode ok e os dados
+            res.status(200).json(editoras); //retorna statusCode ok e os dados
         }catch(error){
             res.status(400).json({msg:error.message}); //retorna status de erro e msg
         }
 });
-
-//Resumo do cadastro de livros
-router.get("/dados/resumo",async (req,res) =>{
-    try{
-        const livros = await dbKnex("editoras")
-        .count({num: "id"})
-        .max({maior: "estado"})
-        const {num,maior} = editoras[0];
-        res.status(200).json({num, maior});
-    }catch(error){
-        res.status(400).json({msg:error.message}); //retorna status de erro e msg
-    }
-})
-
-//Exibir o gráfico com a soma dos preços agrupados por ano
-router.get("/dados/grafico",async (req,res) =>{
-    try{
-        //obtém ano e soma do preço dos livros, Agrupados por ano
-        const mediaEstados = await dbKnex("editoras")
-        .select("estado")
-        .avg({Média:"estado"})
-        .groupBy("estado");
-        res.status(200).json(mediaEstados);
-    }catch(error){
-        res.status(400).json({msg:error.message}); //retorna status de erro e msg
-    }
-})
-
 
 
 module.exports = router;

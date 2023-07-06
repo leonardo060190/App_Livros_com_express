@@ -32,7 +32,7 @@ router.post("/cadastro",async (req,res)=>{
 
     //caso ocorra algum erro na inclusão, o programa irá capturar(catch) o erro
     try{
-        //insert, faz a inserção na tabela livros(e retorna o id do registro inserido)
+        //insert, faz a inserção na tabela autores(e retorna o id do registro inserido)
         const novo = await dbKnex("autores").insert({nome, sobrenome, data_nascimento, sexo, descricao, telefone, foto});
         res.status(201).json({id:novo[0]}); //statuscode indica Create
     }catch(error){
@@ -44,10 +44,10 @@ router.post("/cadastro",async (req,res)=>{
 //método put é usado para alteração. id indica o registro a ser alterado
 router.put("/:id",async(req,res) => {
     const id = req.params.id; //
-    const {descricao,telefone,foto} = req.body;
+    const {telefone} = req.body;
     try{
         //altera os campos, no registro cujo id coincidir com o parametro passado
-        await dbKnex("autores").update({descricao,telefone,foto}).where({id});
+        await dbKnex("autores").update({telefone}).where({id});
         res.status(200).json(); //statusCode indica ok
     }catch(error){
         res.status(400).json({msg:error.message}); //retorna status de erro e msg
@@ -70,7 +70,7 @@ router.delete("/:id",async(req,res) => {
 router.get("/filtro/:palavra", async(req,res)=> {
     const palavra = req.params.palavra; // palavra ou titulo a pesquisar
     try{
-            const livros = await dbKnex("autores")
+            const autores = await dbKnex("autores")
             .where("nome","like", `%${palavra}%`)
             .orWhere("sobrenome","like",`%${palavra}%`);
             res.status(200).json(autores); //retorna statusCode ok e os dados
@@ -78,34 +78,6 @@ router.get("/filtro/:palavra", async(req,res)=> {
             res.status(400).json({msg:error.message}); //retorna status de erro e msg
         }
 });
-
-//Resumo do cadastro de autores
-router.get("/dados/resumo",async (req,res) =>{
-    try{
-        const livros = await dbKnex("autores")
-        .select({quantidade:"sexo"})
-        .count({num: "*"})
-        .groupBy(sexo)
-        const {quantidade, num, sexo} = autores[0];
-        res.status(200).json({quantidade,num,sexo});
-    }catch(error){
-        res.status(400).json({msg:error.message}); //retorna status de erro e msg
-    }
-})
-
-//Exibir o gráfico com a soma dos preços agrupados por ano
-router.get("/dados/grafico",async (req,res) =>{
-    try{
-        //obtém ano e soma do preço dos livros, Agrupados por ano
-        const tipoAutores = await dbKnex("autores")
-        .select("sexo")
-        .count({total:"*"})
-        .groupBy("sexo");
-        res.status(200).json(totalPorAno);
-    }catch(error){
-        res.status(400).json({msg:error.message}); //retorna status de erro e msg
-    }
-})
 
 
 module.exports = router;
